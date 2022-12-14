@@ -1,0 +1,20 @@
+version: "2"
+services:
+
+  pushpin:
+    image: fanout/pushpin:latest
+    volumes:
+      - ./routes:/etc/pushpin/routes
+    ports:
+      - "7999:7999"
+      - "5561:5561"
+    depends_on:
+      - go-service
+
+  go-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    ports:
+      - "8080:8080"
