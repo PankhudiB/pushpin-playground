@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/fanout/go-gripcontrol"
+	pubcontrol "github.com/fanout/go-pubcontrol"
 	"github.com/gin-gonic/gin"
 	"io"
 	"io/ioutil"
@@ -19,6 +20,10 @@ func main() {
 	router.Handle("POST", "/subscribe", func(context *gin.Context) {
 		fmt.Println("Got /subscribe  request on origin server")
 		Subscribe(context.Writer, context.Request)
+	})
+	router.Handle("POST", "/publish", func(context *gin.Context) {
+		fmt.Println("About to publish")
+		Publish(context.Writer, context.Request)
 	})
 
 	err := http.ListenAndServe(":8080", router)
@@ -76,4 +81,27 @@ func Subscribe(writer http.ResponseWriter, request *http.Request) {
 			fmt.Println("Err writing outEvents to writer: ", err1.Error())
 		}
 	}
+}
+
+func Publish(writer http.ResponseWriter, request *http.Request) {
+
+	data, _ := ioutil.ReadAll(request.Body)
+	fmt.Println("Data to be published: ", string(data))
+
+	writer.Header().Set("Content-Type", "application/websocket-events")
+
+	pub := gripcontrol.NewGripPubControl([]map[string]interface{}{
+		map[string]interface{}{"control_uri": "http://pushpin:5561"}})
+
+	format := &gripcontrol.WebSocketMessageFormat{
+		Content: data}
+
+	item := pubcontrol.NewItem([]pubcontrol.Formatter{format}, "", "")
+
+	err := pub.Publish("test", item)
+
+	if err != nil {
+		panic("Publish failed with: " + err.Error())
+	}
+
 }
