@@ -1,26 +1,32 @@
-# Pushpin Playground
+### App to broadcast events to websocket clients via Pushpin   
 
-To start the origin server
+--------
+#### Architecture Diagram :
+
+![](websocket-pushpin.png)
+
+
+#### To start the origin server
 
 ```
 docker-compose build
 docker-compose up
 ```
 -------
-Pushpin routes file:
+#### Pushpin routes file:
 
 ```
 *,debug go-service:8080,over_http
 ```
 -------
-Sample client repo at : https://github.com/PankhudiB/websocket-client
+#### Sample client repo at : https://github.com/PankhudiB/websocket-client
 
 Client request to subscribe to `test` channel:
 
 > websocat -v ws://localhost:7999/subscribe
 -------
 
-To publish event to `test` channel for clients connected through `websocket` protocol :
+#### To publish event to `test` channel for clients connected through `websocket` protocol :
 
 
 Through Terminal :
