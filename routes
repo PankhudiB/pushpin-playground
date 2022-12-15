@@ -1,1 +1,1 @@
-* go-service:8080,over_http
+*,debug go-service:8080,over_http

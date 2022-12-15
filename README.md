@@ -26,3 +26,7 @@ curl -d '{ "items": [ { "channel": "test", "formats": {
     http://localhost:5561/publish/
 ```
 
+To publish event through externally triggering origin-server on `test` channel:
+```
+curl -v --data "updated_state" http://localhost:8080/publish
+```

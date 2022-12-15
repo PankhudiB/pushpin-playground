@@ -74,7 +74,10 @@ func Subscribe(writer http.ResponseWriter, request *http.Request) {
 		outEvents := []*gripcontrol.WebSocketEvent{
 			&gripcontrol.WebSocketEvent{Type: "OPEN"},
 			&gripcontrol.WebSocketEvent{Type: "TEXT",
-				Content: "c:" + wsControlMessage}}
+				Content: "c:" + wsControlMessage},
+			&gripcontrol.WebSocketEvent{Type: "TEXT",
+				Content: "Initial State"},
+		}
 
 		_, err1 := io.WriteString(writer, gripcontrol.EncodeWebSocketEvents(outEvents))
 		if err1 != nil {
