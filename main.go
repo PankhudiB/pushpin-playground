@@ -27,7 +27,7 @@ func main() {
 		return
 	})
 
-	router.Handle("GET", "/", func(context *gin.Context) {
+	router.Handle("POST", "/", func(context *gin.Context) {
 		HandleRequest(context.Writer, context.Request)
 	})
 
@@ -62,7 +62,7 @@ func HandleRequest(writer http.ResponseWriter, request *http.Request) {
 	if inEvents[0].Type == "OPEN" {
 		// Create the WebSocket control message:
 		wsControlMessage, err := gripcontrol.WebSocketControlMessage("subscribe",
-			map[string]interface{}{"channel": "ws-test"})
+			map[string]interface{}{"channel": "test"})
 		if err != nil {
 			panic("Unable to create control message: " + err.Error())
 		}
@@ -88,7 +88,7 @@ func HandleRequest(writer http.ResponseWriter, request *http.Request) {
 			format := &gripcontrol.WebSocketMessageFormat{
 				Content: []byte("Test WebSocket Publish!!")}
 			item := pubcontrol.NewItem([]pubcontrol.Formatter{format}, "", "")
-			err = pub.Publish("ws-test", item)
+			err = pub.Publish("test", item)
 			if err != nil {
 				panic("Publish failed with: " + err.Error())
 			}
