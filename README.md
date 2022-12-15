@@ -6,19 +6,24 @@ To start the origin server
 docker-compose build
 docker-compose up
 ```
-
+-------
 Pushpin routes file:
 
 ```
 *,debug go-service:8080,over_http
 ```
+-------
+Sample client repo at : https://github.com/PankhudiB/websocket-client
 
-Client request to subscribe to test channel:
+Client request to subscribe to `test` channel:
 
 > websocat -v ws://localhost:7999/subscribe
+-------
+
+To publish event to `test` channel for clients connected through `websocket` protocol :
 
 
-To publish event from terminal to test channel:
+Through Terminal :
 
 ```
 curl -d '{ "items": [ { "channel": "test", "formats": {
@@ -26,7 +31,10 @@ curl -d '{ "items": [ { "channel": "test", "formats": {
     http://localhost:5561/publish/
 ```
 
-To publish event through externally triggering origin-server on `test` channel:
+OR 
+
+Trigger through origin-server : 
 ```
 curl -v --data "updated_state" http://localhost:8080/publish
 ```
+-------
