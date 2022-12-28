@@ -2,11 +2,14 @@ module website-status-checker-in-go
 
 go 1.17
 
-require github.com/gin-gonic/gin v1.8.1
+require (
+	github.com/fanout/go-gripcontrol v0.0.0-20221104002018-3c4f3237983d
+	github.com/fanout/go-pubcontrol v0.0.0-20221104002353-f2d4ca3c83f0
+	github.com/gin-gonic/gin v1.8.1
+	github.com/pebbe/zmq4 v1.2.9
+)
 
 require (
-	github.com/fanout/go-gripcontrol v0.0.0-20221104002018-3c4f3237983d // indirect
-	github.com/fanout/go-pubcontrol v0.0.0-20221104002353-f2d4ca3c83f0 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect

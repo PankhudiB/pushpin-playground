@@ -5,6 +5,7 @@ import (
 	"github.com/fanout/go-gripcontrol"
 	pubcontrol "github.com/fanout/go-pubcontrol"
 	"github.com/gin-gonic/gin"
+	zmq "github.com/pebbe/zmq4"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -13,9 +14,20 @@ import (
 func main() {
 	router := gin.Default()
 
-	router.Handle("POST", "/echo", func(context *gin.Context) {
-		fmt.Println("Got /echo request on origin server")
-		Echo(context.Writer, context.Request)
+	zctx, err := zmq.NewContext()
+	s, err := zctx.NewSocket(zmq.PUB)
+	err = s.Bind("tcp://*:8081")
+	if err != nil {
+		fmt.Println("Err binding socket : ", err.Error())
+	}
+
+	router.Handle("GET", "/publish-on-zmq", func(context *gin.Context) {
+		fmt.Println("Got /publish-on-zmq request on origin server")
+		PublishOverZMQ(context.Writer, context.Request, s)
+	})
+	router.Handle("GET", "/stats", func(context *gin.Context) {
+		fmt.Println("Got /stats request on origin server")
+		GetStats(context.Writer, context.Request)
 	})
 	router.Handle("POST", "/subscribe", func(context *gin.Context) {
 		fmt.Println("Got /subscribe  request on origin server")
@@ -26,25 +38,52 @@ func main() {
 		Publish(context.Writer, context.Request)
 	})
 
-	err := http.ListenAndServe(":8080", router)
-	if err != nil {
-		fmt.Println("Error starting router : ", err.Error())
+	err1 := http.ListenAndServe(":8080", router)
+	if err1 != nil {
+		fmt.Println("Error starting router : ", err1.Error())
 	}
 }
 
-func Echo(writer http.ResponseWriter, request *http.Request) {
+func PublishOverZMQ(writer http.ResponseWriter, request *http.Request, s *zmq.Socket) {
+	fmt.Println("/publish-on-zmq got ==> Body : ")
 
-	body, _ := ioutil.ReadAll(request.Body)
-	fmt.Println("/echo got ==> Body : ", string(body))
+	sentTopic, err := s.Send(`publish`, zmq.SNDMORE)
+	if err != nil {
+		fmt.Println("Err sending : ", err.Error())
+	}
+	fmt.Printf("sentTopic : ", sentTopic)
 
-	writer.Header().Set("Content-Type", "application/websocket-events")
-	writer.Write(body)
+	sent, err := s.Send(`J{"id": "1", "channel": "test", "formats": {"ws-message": {"content": "blah\n"}}}`, 0)
+	if err != nil {
+		fmt.Println("Err sending : ", err.Error())
+	}
+	fmt.Printf("Sent : ", sent)
+}
+
+func GetStats(writer http.ResponseWriter, request *http.Request) {
+	zctx, err := zmq.NewContext()
+	if err != nil {
+		fmt.Println("Err ctx : ", err.Error())
+	}
+	socket, err := zctx.NewSocket(zmq.REQ)
+	if err != nil {
+		fmt.Println("Err soc : ", err.Error())
+	}
+	err = socket.Connect("")
+
+	for {
+		recved, err := socket.Recv(0)
+		if err != nil {
+			fmt.Println("Err receiving : ", err.Error())
+		}
+		fmt.Println("Received : ", recved)
+	}
 }
 
 func Subscribe(writer http.ResponseWriter, request *http.Request) {
 
 	inputBody, _ := ioutil.ReadAll(request.Body)
-	fmt.Println("/echo got ==> Body : ", string(inputBody))
+	fmt.Println("/publish-on-zmq got ==> Body : ", string(inputBody))
 
 	writer.Header().Set("Content-Type", "application/websocket-events")
 
@@ -64,6 +103,8 @@ func Subscribe(writer http.ResponseWriter, request *http.Request) {
 		shouldSubscribe = true
 	}
 
+	fmt.Println("should subscribe ? ", shouldSubscribe)
+
 	if shouldSubscribe {
 		wsControlMessage, err := gripcontrol.WebSocketControlMessage("subscribe",
 			map[string]interface{}{"channel": "test"})
@@ -75,15 +116,16 @@ func Subscribe(writer http.ResponseWriter, request *http.Request) {
 			&gripcontrol.WebSocketEvent{Type: "OPEN"},
 			&gripcontrol.WebSocketEvent{Type: "TEXT",
 				Content: "c:" + wsControlMessage},
-			&gripcontrol.WebSocketEvent{Type: "TEXT",
-				Content: "Initial State"},
 		}
 
-		_, err1 := io.WriteString(writer, gripcontrol.EncodeWebSocketEvents(outEvents))
+		n, err1 := io.WriteString(writer, gripcontrol.EncodeWebSocketEvents(outEvents))
 		if err1 != nil {
 			fmt.Println("Err writing outEvents to writer: ", err1.Error())
+			return
 		}
+		fmt.Println("Wrote : ", n)
 	}
+
 }
 
 func Publish(writer http.ResponseWriter, request *http.Request) {
@@ -94,7 +136,7 @@ func Publish(writer http.ResponseWriter, request *http.Request) {
 	writer.Header().Set("Content-Type", "application/websocket-events")
 
 	pub := gripcontrol.NewGripPubControl([]map[string]interface{}{
-		map[string]interface{}{"control_uri": "http://pushpin:5561"}})
+		map[string]interface{}{"control_uri": "http://localhost:5561"}})
 
 	format := &gripcontrol.WebSocketMessageFormat{
 		Content: data}
