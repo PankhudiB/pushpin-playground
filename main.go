@@ -1,6 +1,6 @@
 package main
 
-import (
+import 	(
 	"fmt"
 	"github.com/fanout/go-gripcontrol"
 	pubcontrol "github.com/fanout/go-pubcontrol"
@@ -9,6 +9,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"time"
 )
 
 func main() {
@@ -23,11 +24,7 @@ func main() {
 
 	router.Handle("GET", "/publish-on-zmq", func(context *gin.Context) {
 		fmt.Println("Got /publish-on-zmq request on origin server")
-		PublishOverZMQ(context.Writer, context.Request, s)
-	})
-	router.Handle("GET", "/stats", func(context *gin.Context) {
-		fmt.Println("Got /stats request on origin server")
-		GetStats(context.Writer, context.Request)
+		PublishOverZMQ(s)
 	})
 	router.Handle("POST", "/subscribe", func(context *gin.Context) {
 		fmt.Println("Got /subscribe  request on origin server")
@@ -44,46 +41,28 @@ func main() {
 	}
 }
 
-func PublishOverZMQ(writer http.ResponseWriter, request *http.Request, s *zmq.Socket) {
+func PublishOverZMQ(s *zmq.Socket) {
 	fmt.Println("/publish-on-zmq got ==> Body : ")
 
-	sentTopic, err := s.Send(`publish`, zmq.SNDMORE)
+	sent, err := s.Send("test", zmq.SNDMORE)
 	if err != nil {
 		fmt.Println("Err sending : ", err.Error())
 	}
-	fmt.Printf("sentTopic : ", sentTopic)
+	fmt.Printf("Sent 1 : ", sent)
 
-	sent, err := s.Send(`J{"id": "1", "channel": "test", "formats": {"ws-message": {"content": "blah\n"}}}`, 0)
-	if err != nil {
-		fmt.Println("Err sending : ", err.Error())
-	}
-	fmt.Printf("Sent : ", sent)
-}
+	time.Sleep(30*time.Second)
 
-func GetStats(writer http.ResponseWriter, request *http.Request) {
-	zctx, err := zmq.NewContext()
-	if err != nil {
-		fmt.Println("Err ctx : ", err.Error())
+	sent2, err2 := s.Send(`J{"id": "2", "formats": {"ws-message": {"content": "blah\n"}}}`, 0)
+	if err2 != nil {
+		fmt.Println("Err sending : ", err2.Error())
 	}
-	socket, err := zctx.NewSocket(zmq.REQ)
-	if err != nil {
-		fmt.Println("Err soc : ", err.Error())
-	}
-	err = socket.Connect("")
-
-	for {
-		recved, err := socket.Recv(0)
-		if err != nil {
-			fmt.Println("Err receiving : ", err.Error())
-		}
-		fmt.Println("Received : ", recved)
-	}
+	fmt.Printf("Sent 2 : ", sent2)
 }
 
 func Subscribe(writer http.ResponseWriter, request *http.Request) {
 
 	inputBody, _ := ioutil.ReadAll(request.Body)
-	fmt.Println("/publish-on-zmq got ==> Body : ", string(inputBody))
+	fmt.Println("/subscribe got ==> Body : ", string(inputBody))
 
 	writer.Header().Set("Content-Type", "application/websocket-events")
 
@@ -136,7 +115,7 @@ func Publish(writer http.ResponseWriter, request *http.Request) {
 	writer.Header().Set("Content-Type", "application/websocket-events")
 
 	pub := gripcontrol.NewGripPubControl([]map[string]interface{}{
-		map[string]interface{}{"control_uri": "http://localhost:5561"}})
+		map[string]interface{}{"control_uri": "http://pushpin:5561"}})
 
 	format := &gripcontrol.WebSocketMessageFormat{
 		Content: data}

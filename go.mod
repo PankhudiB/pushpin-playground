@@ -1,6 +1,6 @@
 module website-status-checker-in-go
 
-go 1.17
+go 1.15
 
 require (
 	github.com/fanout/go-gripcontrol v0.0.0-20221104002018-3c4f3237983d
@@ -10,6 +10,7 @@ require (
 )
 
 require (
+	github.com/alecthomas/gozmq v0.0.0-20140622232202-d1b01a2df6b2 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-playground/locales v0.14.0 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect

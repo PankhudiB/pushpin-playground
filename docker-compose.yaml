@@ -2,13 +2,19 @@ version: "3"
 services:
 
   pushpin:
-    image: fanout/pushpin:latest
-    network_mode: "host"
-    volumes:
-      - ./routes:/etc/pushpin/routes
+    build:
+      context: .
+      dockerfile: pushpin.Dockerfile
     ports:
       - "7999:7999"
       - "5561:5561"
       - "5562:5562"
-    environment:
-      PKG_CONFIG_PATH: "/usr/local/Cellar/zeromq/4.3.4/lib/pkgconfig/"
+    depends_on:
+      - go-service
+
+  go-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"

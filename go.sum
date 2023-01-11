@@ -1,3 +1,5 @@
+github.com/alecthomas/gozmq v0.0.0-20140622232202-d1b01a2df6b2 h1:avoSu+wd97LeIY/JW9gQQwo6uKmsBOuWtLTJT5ewHWU=
+github.com/alecthomas/gozmq v0.0.0-20140622232202-d1b01a2df6b2/go.mod h1:4M6gCnOnuQEAVnqf5I1tc+/6c6ZiScidY+LkurMUcbY=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
