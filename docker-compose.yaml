@@ -11,10 +11,25 @@ services:
       - "5562:5562"
     depends_on:
       - go-service
+    network_mode: "host"
 
+  zero-server:
+    build:
+      context: .
+      dockerfile: python.Dockerfile
+    network_mode: "host"
+
+  zero-client:
+    build:
+      context: .
+      dockerfile: python.Dockerfile
+    network_mode: "host"
+  
   go-service:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
+      - "5562:5562"
+    network_mode: "host"  

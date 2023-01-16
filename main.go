@@ -9,7 +9,6 @@ import 	(
 	"io"
 	"io/ioutil"
 	"net/http"
-	"time"
 )
 
 func main() {
@@ -17,7 +16,7 @@ func main() {
 
 	zctx, err := zmq.NewContext()
 	s, err := zctx.NewSocket(zmq.PUB)
-	err = s.Bind("tcp://*:8081")
+	err = s.Bind("tcp://*:5562")
 	if err != nil {
 		fmt.Println("Err binding socket : ", err.Error())
 	}
@@ -49,8 +48,6 @@ func PublishOverZMQ(s *zmq.Socket) {
 		fmt.Println("Err sending : ", err.Error())
 	}
 	fmt.Printf("Sent 1 : ", sent)
-
-	time.Sleep(30*time.Second)
 
 	sent2, err2 := s.Send(`J{"id": "2", "formats": {"ws-message": {"content": "blah\n"}}}`, 0)
 	if err2 != nil {
