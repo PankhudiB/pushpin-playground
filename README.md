@@ -9,14 +9,13 @@
 #### To start the origin server
 
 ```
-docker-compose build
-docker-compose up
+make up
 ```
 -------
 #### Pushpin routes file:
 
 ```
-*,debug go-service:8080,over_http
+* localhost:8080,over_http
 ```
 -------
 #### Sample client repo at : https://github.com/PankhudiB/websocket-client
@@ -42,5 +41,10 @@ OR
 Trigger through origin-server : 
 ```
 curl -v --data "updated_state" http://localhost:8080/publish
+```
+
+Trigger through origin-server  USING ZEROMQ:
+```
+curl -v --data "updated_state" http://localhost:8080/publish-on-zmq
 ```
 -------
