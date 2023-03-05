@@ -1,6 +1,6 @@
 package main
 
-import 	(
+import (
 	"fmt"
 	"github.com/fanout/go-gripcontrol"
 	pubcontrol "github.com/fanout/go-pubcontrol"
@@ -49,7 +49,7 @@ func PublishOverZMQ(s *zmq.Socket) {
 	}
 	fmt.Printf("Sent 1 : ", sent)
 
-	sent2, err2 := s.Send(`J{"id": "2", "formats": {"ws-message": {"content": "blah\n"}}}`, 0)
+	sent2, err2 := s.Send(`J{"formats": {"ws-message": {"content": "blah\n"}}}`, 0)
 	if err2 != nil {
 		fmt.Println("Err sending : ", err2.Error())
 	}
@@ -112,7 +112,7 @@ func Publish(writer http.ResponseWriter, request *http.Request) {
 	writer.Header().Set("Content-Type", "application/websocket-events")
 
 	pub := gripcontrol.NewGripPubControl([]map[string]interface{}{
-		map[string]interface{}{"control_uri": "http://pushpin:5561"}})
+		map[string]interface{}{"control_uri": "http://docker.for.mac.localhost:5561"}})
 
 	format := &gripcontrol.WebSocketMessageFormat{
 		Content: data}
