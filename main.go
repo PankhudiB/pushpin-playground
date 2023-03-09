@@ -16,14 +16,14 @@ func main() {
 
 	zctx, err := zmq.NewContext()
 	s, err := zctx.NewSocket(zmq.PUB)
-	err = s.Bind("tcp://*:5562")
+	err = s.Connect("tcp://docker.for.mac.localhost:5562")
 	if err != nil {
 		fmt.Println("Err binding socket : ", err.Error())
 	}
 
-	router.Handle("GET", "/publish-on-zmq", func(context *gin.Context) {
+	router.Handle("POST", "/publish-on-zmq", func(context *gin.Context) {
 		fmt.Println("Got /publish-on-zmq request on origin server")
-		PublishOverZMQ(s)
+		PublishOverZMQ(s, context.Request)
 	})
 	router.Handle("POST", "/subscribe", func(context *gin.Context) {
 		fmt.Println("Got /subscribe  request on origin server")
@@ -40,7 +40,10 @@ func main() {
 	}
 }
 
-func PublishOverZMQ(s *zmq.Socket) {
+func PublishOverZMQ(s *zmq.Socket, request *http.Request) {
+	data, _ := ioutil.ReadAll(request.Body)
+	fmt.Println("Data to be published: ", string(data))
+
 	fmt.Println("/publish-on-zmq got ==> Body : ")
 
 	sent, err := s.Send("test", zmq.SNDMORE)
@@ -49,7 +52,8 @@ func PublishOverZMQ(s *zmq.Socket) {
 	}
 	fmt.Printf("Sent 1 : ", sent)
 
-	sent2, err2 := s.Send(`J{"formats": {"ws-message": {"content": "blah\n"}}}`, 0)
+	formattedMessage := `J{"formats": {"ws-message": {"content": "` + string(data) + `\n"}}}`
+	sent2, err2 := s.Send(formattedMessage, 0)
 	if err2 != nil {
 		fmt.Println("Err sending : ", err2.Error())
 	}

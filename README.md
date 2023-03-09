@@ -28,7 +28,7 @@ Client request to subscribe to `test` channel:
 #### To publish event to `test` channel for clients connected through `websocket` protocol :
 
 
-Through Terminal :
+Through Pushpin's HTTP endpoint :
 
 ```
 curl -d '{ "items": [ { "channel": "test", "formats": {
@@ -38,13 +38,13 @@ curl -d '{ "items": [ { "channel": "test", "formats": {
 
 OR 
 
-Trigger through origin-server : 
+Through origin-server - that internally triggers HTTP endpoint of pushpin: 
 ```
-curl -v --data "updated_state" http://localhost:8080/publish
+curl -v --data "updated_state via HTTP" http://localhost:8080/publish
 ```
 
-Trigger through origin-server  USING ZEROMQ:
+Through origin-server - that internally uses ZEROMQ to publish the data:
 ```
-curl -v --data "updated_state" http://localhost:8080/publish-on-zmq
+curl -v --data "updated_state via ZMQ" http://localhost:8080/publish-on-zmq
 ```
 -------
