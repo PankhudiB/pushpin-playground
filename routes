@@ -1,2 +1,3 @@
-* localhost:8080,over_http
+*,path_beg=/api/go-app/ localhost:8080,over_http
+*,path_beg=/api/push/,replace_beg=/api/go-app/ localhost:8080,over_http
 

@@ -25,7 +25,7 @@ func main() {
 		fmt.Println("Got /publish-on-zmq request on origin server")
 		PublishOverZMQ(s, context.Request)
 	})
-	router.Handle("POST", "/subscribe", func(context *gin.Context) {
+	router.Handle("POST", "/api/go-app/subscribe", func(context *gin.Context) {
 		fmt.Println("Got /subscribe  request on origin server")
 		Subscribe(context.Writer, context.Request)
 	})

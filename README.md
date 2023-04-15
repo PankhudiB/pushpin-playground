@@ -22,7 +22,11 @@ make up
 
 Client request to subscribe to `test` channel:
 
-> websocat -v ws://localhost:7999/subscribe
+> websocat -v ws://localhost:7999/api/push/subscribe
+
+OR
+
+> websocat -v ws://localhost:7999/api/go-app/subscribe
 -------
 
 #### To publish event to `test` channel for clients connected through `websocket` protocol :
